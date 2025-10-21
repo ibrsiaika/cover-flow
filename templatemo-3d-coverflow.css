@@ -1277,3 +1277,229 @@ https://templatemo.com/tm-595-3d-coverflow
                 border-radius: 25px;
             }
         }
+
+        /* Search Section */
+        #search {
+            background: radial-gradient(ellipse at center, #0f0f0f 0%, #000 100%);
+        }
+
+        .search-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px;
+            color: white;
+            width: 100%;
+        }
+
+        .search-hero {
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 30px;
+        }
+
+        .search-hero h2 {
+            font-size: 44px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .search-hero p {
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 18px;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 12px;
+            margin: 30px auto 20px;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 60px;
+            padding: 10px;
+            backdrop-filter: blur(8px);
+        }
+
+        .search-form input[type="text"] {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 18px;
+            padding: 12px 18px;
+            outline: none;
+        }
+
+        .search-btn,
+        .lucky-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+        }
+
+        .search-btn:hover,
+        .lucky-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+        }
+
+        .engine-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            padding: 14px 18px;
+            text-align: center;
+        }
+
+        .stat-card .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-card .stat-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.65);
+            letter-spacing: 0.4px;
+        }
+
+        .results {
+            margin-top: 10px;
+        }
+
+        .results-loading,
+        .results-error,
+        .results-empty {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: center;
+        }
+
+        .results-empty-title {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .results-empty-subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .result-item {
+            display: block;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 16px 18px;
+            margin-bottom: 12px;
+            transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+            color: white;
+        }
+
+        .result-item:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.18);
+        }
+
+        .result-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .result-url {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 8px;
+        }
+
+        .result-snippet {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .result-snippet mark {
+            background: rgba(102, 126, 234, 0.25);
+            color: #fff;
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+
+        .crawler-panel {
+            margin-top: 24px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            padding: 18px;
+        }
+
+        .crawler-panel h3 {
+            margin-bottom: 12px;
+        }
+
+        .crawl-form .crawl-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 12px;
+            align-items: end;
+            margin-bottom: 12px;
+        }
+
+        .crawl-form .form-group.checkbox {
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+
+        .status-box {
+            margin-top: 10px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        @media (max-width: 900px) {
+            .engine-stats {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+            .crawl-form .crawl-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .search-hero h2 {
+                font-size: 32px;
+            }
+            .search-form {
+                flex-direction: column;
+                gap: 10px;
+                border-radius: 16px;
+            }
+            .search-btn, .lucky-btn {
+                width: 100%;
+            }
+        }

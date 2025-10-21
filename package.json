@@ -1,0 +1,15 @@
+{
+  "name": "genie-search",
+  "version": "1.0.0",
+  "description": "Full‑stack search engine starter (crawler + ranker) with unique scoring formula",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "cheerio": "^1.0.0-rc.12",
+    "compression": "^1.7.4",
+    "express": "^4.19.2"
+  }
+}

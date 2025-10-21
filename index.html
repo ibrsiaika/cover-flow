@@ -36,6 +36,7 @@ https://templatemo.com/tm-595-3d-coverflow
         
         <nav class="main-menu" id="mainMenu">
             <a href="#home" class="menu-item active">Home</a>
+            <a href="#search" class="menu-item">Search</a>
             <a href="#about" class="menu-item">About</a>
             <a href="#contact" class="menu-item">Contact</a>
             <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="menu-item external">GitHub</a>
@@ -112,6 +113,47 @@ https://templatemo.com/tm-595-3d-coverflow
                     <span class="play-icon">▶</span>
                     <span class="pause-icon" style="display: none;">❚❚</span>
                 </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search Section -->
+    <section id="search" class="section">
+        <div class="search-content">
+            <div class="search-hero">
+                <h2>Genie Search</h2>
+                <p>Private, local-first search with a unique scoring formula. Index any site and search instantly.</p>
+            </div>
+
+            <form id="searchForm" class="search-form">
+                <input id="searchInput" type="text" placeholder="Search… (try typing a query)" autocomplete="off" required>
+                <button type="submit" class="search-btn">Search</button>
+                <button type="button" id="luckyBtn" class="lucky-btn">I'm Feeling Lucky</button>
+            </form>
+
+            <div id="engineStats" class="engine-stats"></div>
+
+            <div id="results" class="results"></div>
+
+            <div class="crawler-panel">
+                <h3>Index your site</h3>
+                <form id="crawlForm" class="crawl-form">
+                    <div class="crawl-grid">
+                        <div class="form-group">
+                            <label for="seedUrl">Seed URL</label>
+                            <input id="seedUrl" type="url" placeholder="https://example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="maxPages">Max Pages</label>
+                            <input id="maxPages" type="number" min="1" max="500" value="50">
+                        </div>
+                        <div class="form-group checkbox">
+                            <label><input type="checkbox" id="sameDomain" checked> Same domain only</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="submit-btn">Start Crawl</button>
+                </form>
+                <div id="crawlStatus" class="status-box">Idle</div>
             </div>
         </div>
     </section>
@@ -269,7 +311,7 @@ https://templatemo.com/tm-595-3d-coverflow
                             </a>
                             <a href="#" class="social-btn" title="Twitter">
                                 <svg viewBox="0 0 24 24">
-                                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
                                 </svg>
                             </a>
                             <a href="#" class="social-btn" title="LinkedIn">
@@ -330,6 +372,7 @@ https://templatemo.com/tm-595-3d-coverflow
     </div>
 
 <script src="templatemo-3d-coverflow-scripts.js"></script>
+<script src="search-app.js"></script>
 
 </body>
 </html>
