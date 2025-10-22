@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3D Coverflow - One Page Portfolio</title>
     <link href="templatemo-3d-coverflow.css" rel="stylesheet">
+    <link href="search.css" rel="stylesheet">
 <!--
 
 TemplateMo 595 3d coverflow
@@ -126,14 +127,16 @@ https://templatemo.com/tm-595-3d-coverflow
             </div>
 
             <form id="searchForm" class="search-form">
-                <input id="searchInput" type="text" placeholder="Search… (try typing a query)" autocomplete="off" required>
+                <input id="searchInput" type="text" placeholder="Search… (try: site:example.com &quot;exact phrase&quot;)" autocomplete="off" required>
                 <button type="submit" class="search-btn">Search</button>
                 <button type="button" id="luckyBtn" class="lucky-btn">I'm Feeling Lucky</button>
             </form>
+            <div id="suggestions" class="suggestions"></div>
 
             <div id="engineStats" class="engine-stats"></div>
 
             <div id="results" class="results"></div>
+            <div id="pagination" class="pagination"></div>
 
             <div class="crawler-panel">
                 <h3>Index your site</h3>
@@ -151,9 +154,14 @@ https://templatemo.com/tm-595-3d-coverflow
                             <label><input type="checkbox" id="sameDomain" checked> Same domain only</label>
                         </div>
                     </div>
-                    <button type="submit" class="submit-btn">Start Crawl</button>
+                    <div class="crawl-actions">
+                        <button type="submit" class="submit-btn">Start Crawl</button>
+                        <button type="button" id="stopCrawlBtn" class="submit-btn" style="background:linear-gradient(135deg,#ff6b6b 0%,#c0392b 100%);">Stop Crawl</button>
+                        <button type="button" id="clearIndexBtn" class="submit-btn" style="background:linear-gradient(135deg,#4b79a1 0%,#283e51 100%);">Clear Index</button>
+                    </div>
                 </form>
                 <div id="crawlStatus" class="status-box">Idle</div>
+            </div>
             </div>
         </div>
     </section>

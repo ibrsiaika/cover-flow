@@ -1,0 +1,67 @@
+/* Extra styles for Search UX */
+
+.suggestions {
+  display: none;
+  max-width: 900px;
+  margin: 0 auto 10px;
+  display: none;
+  padding: 6px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+}
+
+.suggestion-item {
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 999px;
+  padding: 6px 10px;
+  margin: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.suggestion-item:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+.pagination .pager {
+  margin-top: 8px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
+.pager-btn {
+  background: rgba(255,255,255,0.08);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.pager-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pager-status {
+  color: rgba(255,255,255,0.7);
+  font-size: 13px;
+}
+
+.crawl-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+@media (max-width: 600px) {
+  .crawl-actions {
+    grid-template-columns: 1fr;
+  }
+}

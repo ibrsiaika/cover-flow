@@ -29,16 +29,26 @@ Then:
   - Serves the static site (index.html, css, js, images).
   - Exposes a REST API:
     - POST /api/crawl
-      body: { seeds: string[], maxPages?: number, sameDomainOnly?: boolean }
+      body: { seeds: string[], maxPages?: number, sameDomainOnly?: boolean, userAgent?: string }
+    - POST /api/crawl/stop
+      stop current crawl gracefully
+    - POST /api/index/clear
+      clear all indexed data
     - GET  /api/status
       returns crawl + index stats
-    - GET  /api/search?q=...&limit=10
-      returns ranked results with snippets
+    - GET  /api/search?q=...&limit=10&offset=0
+      returns ranked results with snippets and pagination support
+    - GET  /api/suggest?q=prefix
+      returns up to 8 term suggestions
 
-- Crawler:
-  - Follows links from your seed URL(s)
-  - Extracts title, meta description, visible text
-  - Builds an inverted index and a simple link graph
+- Crawler (features):
+  - Respects robots.txt Disallow rules (basic, wildcard not supported)
+  - Simple per‑host crawl delay (1s)
+  - Reads Sitemap entries announced by robots.txt (basic <loc> parsing)
+  - Canonical URL support (<link rel="canonical">)
+  - Duplicate detection via content hash
+  - Content‑Type validation (HTML only)
+  - Builds an inverted index and link graph (authority/PageRank style)
 
 - Unique ranking formula (“BM25‑ish + signals”):
   score = base(tf‑idf with sqrt(tf)) × titleBoost × phraseBoost × recency × depth × authority
@@ -50,16 +60,25 @@ Then:
   - depth: mild penalty for deep URLs (shallower paths favored slightly)
   - authority: simple PageRank‑style score derived from the crawl graph and normalized to [0..1]
 
+- Search syntax:
+  - Quotes enforce an exact phrase: "deep learning"
+  - site:example.com filters by host
+  - Pagination: limit, offset
+
 - Frontend:
   - Clean search UI with instant results
   - “I’m Feeling Lucky”
-  - Crawler control panel + live status
+  - Suggestions/autocomplete (prefix, top by df)
+  - Pagination controls
+  - Crawler controls: Start, Stop, Clear index
+  - Live status and stats
   - Responsive layout consistent with the existing template
 
 ## Notes and limits
 
 - This is a compact, educational search engine. It’s not meant to replace Google. It’s designed to be understandable, hackable, and deployable quickly.
-- The crawler respects only basic constraints (no robots.txt parsing). Add production‑grade politeness, rate limiting, and robots handling if you plan to crawl broadly.
+- Robots.txt support is basic (no wildcards/allow precedence). Add a full parser if you need strict compliance.
+- Add rate‑limit/backoff, user‑agent identification, and storage backends as needed.
 - The index is stored to disk under ./data/ and automatically loaded on restart.
 
 ## Deploying
@@ -73,8 +92,8 @@ Then:
 ## Customizing
 
 - Ranking: Update the factors in server.js (bm25ishScore) to tweak weights.
-- Crawler scope: Change sameDomainOnly or add allow/deny rules.
-- UI/UX: Edit the Search section in index.html and styles at the bottom of templatemo-3d-coverflow.css.
+- Crawler scope: Change sameDomainOnly or add allow/deny rules; adjust CRAWL_DELAY_MS.
+- UI/UX: Update the Search section in index.html and styles in search.css.
 
 ## API Examples
 
@@ -83,11 +102,20 @@ curl -X POST http://localhost:3000/api/crawl \
   -H "Content-Type: application/json" \
   -d '{"seeds": ["https://example.com"], "maxPages": 50, "sameDomainOnly": true}'
 
+Stop a crawl:
+curl -X POST http://localhost:3000/api/crawl/stop
+
+Clear index:
+curl -X POST http://localhost:3000/api/index/clear
+
 Check status:
 curl http://localhost:3000/api/status
 
 Run a search:
-curl "http://localhost:3000/api/search?q=example&limit=5"
+curl "http://localhost:3000/api/search?q=site:example.com%20\"privacy%20policy\"&limit=5&offset=0"
+
+Get suggestions:
+curl "http://localhost:3000/api/suggest?q=priv"
 
 ## License
 

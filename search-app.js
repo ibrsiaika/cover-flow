@@ -4,12 +4,20 @@
   const qInput = document.getElementById('searchInput');
   const form = document.getElementById('searchForm');
   const resultsEl = document.getElementById('results');
+  const paginationEl = document.getElementById('pagination');
+  const suggestionsEl = document.getElementById('suggestions');
   const luckyBtn = document.getElementById('luckyBtn');
   const crawlForm = document.getElementById('crawlForm');
   const crawlStatusEl = document.getElementById('crawlStatus');
   const engineStatsEl = document.getElementById('engineStats');
+  const stopCrawlBtn = document.getElementById('stopCrawlBtn');
+  const clearIndexBtn = document.getElementById('clearIndexBtn');
 
   let pollTimer = null;
+  let lastQuery = '';
+  let totalCount = 0;
+  const pageSize = 10;
+  let currentOffset = 0;
 
   function escapeHtml(str) {
     return (str || '').replace(/[&<>"']/g, s => ({
@@ -17,19 +25,15 @@
     })[s]);
   }
 
-  function stripTags(s) {
-    const div = document.createElement('div');
-    div.innerHTML = s;
-    return div.textContent || div.innerText || '';
-  }
-
   function renderResults(data) {
+    totalCount = data && typeof data.count === 'number' ? data.count : 0;
     if (!data || !Array.isArray(data.results) || data.results.length === 0) {
       resultsEl.innerHTML = `
         <div class="results-empty">
           <div class="results-empty-title">No results</div>
           <div class="results-empty-subtitle">Try different keywords or index a site below.</div>
         </div>`;
+      paginationEl.innerHTML = '';
       return;
     }
 
@@ -47,13 +51,48 @@
       `);
     }
     resultsEl.innerHTML = parts.join('');
+    renderPagination();
   }
 
-  async function doSearch(query) {
+  function renderPagination() {
+    const prevDisabled = currentOffset <= 0;
+    const nextDisabled = currentOffset + pageSize >= totalCount;
+    const start = totalCount === 0 ? 0 : currentOffset + 1;
+    const end = Math.min(totalCount, currentOffset + pageSize);
+
+    paginationEl.innerHTML = `
+      <div class="pager">
+        <button class="pager-btn" ${prevDisabled ? 'disabled' : ''} id="prevPage">Prev</button>
+        <div class="pager-status">${start}-${end} of ${totalCount}</div>
+        <button class="pager-btn" ${nextDisabled ? 'disabled' : ''} id="nextPage">Next</button>
+      </div>
+    `;
+
+    const prev = document.getElementById('prevPage');
+    const next = document.getElementById('nextPage');
+    if (prev) prev.addEventListener('click', () => {
+      if (currentOffset >= pageSize) {
+        currentOffset -= pageSize;
+        doSearch(lastQuery, currentOffset);
+      }
+    });
+    if (next) next.addEventListener('click', () => {
+      if (currentOffset + pageSize < totalCount) {
+        currentOffset += pageSize;
+        doSearch(lastQuery, currentOffset);
+      }
+    });
+  }
+
+  async function doSearch(query, offset = 0) {
     if (!query || !query.trim()) return;
+    lastQuery = query;
+    currentOffset = offset;
     resultsEl.innerHTML = '<div class="results-loading">Searching…</div>';
+    paginationEl.innerHTML = '';
+
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}&limit=10`);
+      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}&limit=${pageSize}&offset=${offset}`);
       const data = await res.json();
       renderResults(data);
     } catch (e) {
@@ -97,6 +136,60 @@
     } catch {
       // ignore
     }
+  }
+
+  async function fetchSuggestions(prefix) {
+    try {
+      const res = await fetch(`/api/suggest?q=${encodeURIComponent(prefix)}`);
+      const data = await res.json();
+      return Array.isArray(data.suggestions) ? data.suggestions : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function renderSuggestions(items) {
+    if (!items || items.length === 0) {
+      suggestionsEl.innerHTML = '';
+      suggestionsEl.style.display = 'none';
+      return;
+    }
+    suggestionsEl.innerHTML = items.map(t => `<button type="button" class="suggestion-item">${escapeHtml(t)}</button>`).join('');
+    suggestionsEl.style.display = 'block';
+    suggestionsEl.querySelectorAll('.suggestion-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const term = btn.textContent || '';
+        const base = qInput.value.trim();
+        const space = base && !base.endsWith(' ') ? ' ' : '';
+        qInput.value = base + space + term;
+        suggestionsEl.style.display = 'none';
+        qInput.focus();
+        doSearch(qInput.value);
+      });
+    });
+  }
+
+  if (qInput) {
+    let suggestTimer = null;
+    qInput.addEventListener('input', () => {
+      const val = qInput.value.trim();
+      if (suggestTimer) clearTimeout(suggestTimer);
+      if (val.length < 2) {
+        suggestionsEl.style.display = 'none';
+        suggestionsEl.innerHTML = '';
+        return;
+      }
+      suggestTimer = setTimeout(async () => {
+        const items = await fetchSuggestions(val.split(/\s+/).pop());
+        renderSuggestions(items);
+      }, 200);
+    });
+
+    qInput.addEventListener('blur', () => {
+      setTimeout(() => {
+        suggestionsEl.style.display = 'none';
+      }, 150);
+    });
   }
 
   if (form) {
@@ -151,6 +244,29 @@
       } catch {
         crawlStatusEl.textContent = 'Failed to start crawl.';
       }
+    });
+  }
+
+  if (stopCrawlBtn) {
+    stopCrawlBtn.addEventListener('click', async () => {
+      try {
+        await fetch('/api/crawl/stop', { method: 'POST' });
+        fetchStatus();
+      } catch {}
+    });
+  }
+
+  if (clearIndexBtn) {
+    clearIndexBtn.addEventListener('click', async () => {
+      if (!confirm('Clear all indexed data?')) return;
+      try {
+        const res = await fetch('/api/index/clear', { method: 'POST' });
+        const data = await res.json();
+        crawlStatusEl.textContent = data.message || 'Cleared.';
+        fetchStatus();
+        resultsEl.innerHTML = '';
+        paginationEl.innerHTML = '';
+      } catch {}
     });
   }
 
