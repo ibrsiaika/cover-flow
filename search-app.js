@@ -93,6 +93,10 @@
 
     try {
       const res = await fetch(`/api/search?q=${encodeURIComponent(query)}&limit=${pageSize}&offset=${offset}`);
+      if (!res.ok) {
+        const tx = await res.text().catch(() => '');
+        throw new Error(`HTTP ${res.status} ${res.statusText} ${tx}`);
+      }
       const data = await res.json();
       renderResults(data);
     } catch (e) {
@@ -103,6 +107,7 @@
   async function fetchStatus() {
     try {
       const res = await fetch('/api/status');
+      if (!res.ok) throw new Error('status failed');
       const data = await res.json();
       const { crawl, index } = data;
 
@@ -141,6 +146,7 @@
   async function fetchSuggestions(prefix) {
     try {
       const res = await fetch(`/api/suggest?q=${encodeURIComponent(prefix)}`);
+      if (!res.ok) return [];
       const data = await res.json();
       return Array.isArray(data.suggestions) ? data.suggestions : [];
     } catch {
@@ -205,6 +211,7 @@
       if (!q) return;
       try {
         const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&limit=1`);
+        if (!res.ok) return;
         const data = await res.json();
         const first = data.results && data.results[0];
         if (first && first.url) {
@@ -234,12 +241,12 @@
             sameDomainOnly: sameDomain
           })
         });
-        const data = await res.json();
-        if (data.ok) {
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.ok) {
           crawlStatusEl.textContent = 'Crawl started.';
           fetchStatus();
         } else {
-          crawlStatusEl.textContent = data.message || 'Failed to start crawl.';
+          crawlStatusEl.textContent = (data && data.message) || 'Failed to start crawl.';
         }
       } catch {
         crawlStatusEl.textContent = 'Failed to start crawl.';
@@ -261,8 +268,8 @@
       if (!confirm('Clear all indexed data?')) return;
       try {
         const res = await fetch('/api/index/clear', { method: 'POST' });
-        const data = await res.json();
-        crawlStatusEl.textContent = data.message || 'Cleared.';
+        const data = await res.json().catch(() => ({}));
+        crawlStatusEl.textContent = (data && data.message) || 'Cleared.';
         fetchStatus();
         resultsEl.innerHTML = '';
         paginationEl.innerHTML = '';

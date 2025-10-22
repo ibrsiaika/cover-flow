@@ -1142,58 +1142,63 @@ app.get('/api/suggest', (req, res) => {
 
 // Search with site: and pagination and phrase parsing
 app.get('/api/search', (req, res) => {
-  const raw = (req.query.q || '').toString().trim();
-  const limit = Math.max(1, Math.min(50, parseInt(req.query.limit, 10) || 10));
-  const offset = Math.max(0, parseInt(req.query.offset, 10) || 0);
-  if (!raw) return res.json({ ok: true, query: raw, results: [] });
+  try {
+    const raw = (req.query.q || '').toString().trim();
+    const limit = Math.max(1, Math.min(50, parseInt(req.query.limit, 10) || 10));
+    const offset = Math.max(0, parseInt(req.query.offset, 10) || 0);
+    if (!raw) return res.json({ ok: true, query: raw, results: [] });
 
-  // Parse phrase in quotes and site:domain
-  const phraseMatch = raw.match(/"([^"]+)"/);
-  const forcedPhrase = phraseMatch ? phraseMatch[1].toLowerCase() : null;
-  const siteMatch = raw.match(/\\bsite:([^\\s]+)/i);
-  const siteFilter = siteMatch ? siteMatch[1].toLowerCase() : null;
+    // Parse phrase in quotes and site:domain
+    const phraseMatch = raw.match(/"([^"]+)"/);
+    const forcedPhrase = phraseMatch ? phraseMatch[1].toLowerCase() : null;
+    const siteMatch = raw.match(/\bsite:([^\s]+)/i);
+    const siteFilter = siteMatch ? siteMatch[1].toLowerCase() : null;
 
-  let cleaned = raw.replace(/"[^"]*"/g, ' ').replace(/\\bsite:[^\\s]+/ig, ' ').trim();
-  const tokens = tokenize(cleaned);
-  if (forcedPhrase) tokens.push(...tokenize(forcedPhrase));
+    let cleaned = raw.replace(/"[^"]*"/g, ' ').replace(/\bsite:[^\s]+/ig, ' ').trim();
+    const tokens = tokenize(cleaned);
+    if (forcedPhrase) tokens.push(...tokenize(forcedPhrase));
 
-  if (tokens.length === 0) return res.json({ ok: true, query: raw, results: [] });
+    if (tokens.length === 0) return res.json({ ok: true, query: raw, results: [] });
 
-  const ranked = bm25ishScore(tokens);
-  let items = ranked;
+    const ranked = bm25ishScore(tokens);
+    let items = ranked;
 
-  // site filter
-  if (siteFilter) {
-    items = items.filter(r => {
-      const url = (indexState.pages[r.docId]?.url || '').toLowerCase();
-      try {
-        const h = new URL(url).host.toLowerCase();
-        return h.includes(siteFilter);
-      } catch { return false; }
+    // site filter
+    if (siteFilter) {
+      items = items.filter(r => {
+        const url = (indexState.pages[r.docId]?.url || '').toLowerCase();
+        try {
+          const h = new URL(url).host.toLowerCase();
+          return h.includes(siteFilter);
+        } catch { return false; }
+      });
+    }
+
+    // phrase enforcement if quotes used
+    if (forcedPhrase) {
+      const ph = forcedPhrase;
+      items = items.filter(r => {
+        const t = (indexState.pages[r.docId]?.text || '').toLowerCase();
+        return t.includes(ph);
+      });
+    }
+
+    const paged = items.slice(offset, offset + limit);
+    const results = paged.map(r => {
+      const page = indexState.pages[r.docId];
+      const snippet = makeSnippet(page.text || '', tokens);
+      return {
+        title: page.title || page.url,
+        url: page.url,
+        score: Number(r.score.toFixed(4)),
+        snippet
+      };
     });
+    res.json({ ok: true, query: raw, count: items.length, offset, limit, results });
+  } catch (err) {
+    res.status(500).json({ ok: false, message: 'Search failed on server.' });
   }
-
-  // phrase enforcement if quotes used
-  if (forcedPhrase) {
-    const ph = forcedPhrase;
-    items = items.filter(r => {
-      const t = (indexState.pages[r.docId]?.text || '').toLowerCase();
-      return t.includes(ph);
-    });
-  }
-
-  const paged = items.slice(offset, offset + limit);
-  const results = paged.map(r => {
-    const page = indexState.pages[r.docId];
-    const snippet = makeSnippet(page.text || '', tokens);
-    return {
-      title: page.title || page.url,
-      url: page.url,
-      score: Number(r.score.toFixed(4)),
-      snippet
-    };
-  });
-  res.json({ ok: true, query: raw, count: items.length, offset, limit, results });
+});
 });
 
 // ------------------------- Boot -------------------------
