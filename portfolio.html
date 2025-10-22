@@ -53,6 +53,7 @@
         .preloader.hide {
             opacity: 0;
             pointer-events: none;
+            visibility: hidden;
         }
 
         .loader {
@@ -1100,6 +1101,7 @@
             }
         }
     </style>
+    <noscript><style>.preloader{display:none !important} body{cursor:auto !important}</style></noscript>
 </head>
 <body>
     <!-- Preloader -->
@@ -1280,19 +1282,35 @@
             "Coding with passion"
         ];
 
-        // Initialize
-        window.addEventListener('DOMContentLoaded', () => {
-            initializeApp();
-        });
+        // Initialize + robust preloader
+        (function setupPreloaderAndInit() {
+            const preloader = document.getElementById('preloader');
+            const hidePreloader = () => {
+                if (!preloader) return;
+                if (preloader.classList.contains('hide')) return;
+                preloader.classList.add('hide');
+                preloader.addEventListener('transitionend', () => {
+                    if (preloader && preloader.parentNode) preloader.parentNode.removeChild(preloader);
+                }, { once: true });
+                // hard fallback in case transitionend doesn't fire
+                setTimeout(() => {
+                    if (preloader && preloader.parentNode) preloader.parentNode.removeChild(preloader);
+                }, 1200);
+            };
+
+            document.addEventListener('DOMContentLoaded', () => {
+                // Initialize all components asap
+                initializeApp();
+                // Also hide shortly after DOM ready (in case window.load is delayed)
+                setTimeout(hidePreloader, 800);
+            });
+            window.addEventListener('load', hidePreloader);
+            window.addEventListener('error', hidePreloader);
+            // ultimate fallback
+            setTimeout(hidePreloader, 4000);
+        })();
 
         function initializeApp() {
-            // Hide preloader
-            setTimeout(() => {
-                const preloader = document.getElementById('preloader');
-                preloader.classList.add('hide');
-                setTimeout(() => preloader.remove(), 500);
-            }, 1500);
-
             // Initialize all components
             initializeCursor();
             initializeParticles();
